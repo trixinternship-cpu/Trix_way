@@ -1,0 +1,9 @@
+*
+!.gitignore
+# Firebase credentials
+/storage/app/firebase/
+/firebase-service-account.json
+
+# Environment files
+.env.*
+!.env.example

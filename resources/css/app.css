@@ -1,0 +1,177 @@
+@import 'tailwindcss';
+
+/* Scan seluruh file Blade */
+@source "../views/**/*.blade.php";
+@source "../js/**/*.js";
+@source "../../app/**/*.php";
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+}
+
+/* =========================================================
+   TRIX WAY - GLOBAL RESPONSIVE LAYER
+   Tidak mengubah warna/identitas visual desktop.
+   ========================================================= */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+body { min-width: 320px; max-width: 100%; overflow-x: hidden; }
+img, video, canvas, iframe, svg { max-width: 100%; }
+
+/* Tabel tetap utuh dan dapat digeser pada layar kecil. */
+.overflow-x-auto,
+.table-responsive,
+[data-responsive-table] {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+/* Mencegah konten panjang mendorong lebar halaman. */
+main, main > *, section, article, .min-w-0 { min-width: 0; }
+input, select, textarea, button { max-width: 100%; }
+input, select, textarea { scroll-margin-top: 6rem; }
+
+@media (max-width: 1023px) {
+    body { overflow-x: hidden; }
+    main.min-h-screen { margin-left: 0 !important; }
+    main[class*="lg:ml-"] { margin-left: 0 !important; }
+
+    /* Sidebar desktop disembunyikan; navigasi mobile dibuat oleh responsive.js. */
+    aside.fixed.inset-y-0.left-0[class*="lg:flex"] { display: none !important; }
+
+    /* Beri ruang aman untuk layar tablet dan HP. */
+    main > header { padding-left: 1rem !important; padding-right: 1rem !important; }
+    main > div, main > section { max-width: 100%; }
+
+    /* Grid Tailwind yang sudah ada dibuat tidak meluber. */
+    [class*="grid-cols-"] { min-width: 0; }
+}
+
+@media (max-width: 640px) {
+    h1 { overflow-wrap: anywhere; }
+    table { white-space: nowrap; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    input, select, textarea { font-size: 16px; }
+
+    /* Toast/notifikasi tidak keluar dari layar HP. */
+    #toastContainer {
+        top: .75rem !important;
+        right: .75rem !important;
+        left: .75rem !important;
+        max-width: calc(100vw - 1.5rem);
+    }
+
+    /* Modal dan panel lebar mengikuti viewport. */
+    [role="dialog"], .modal, [data-modal-panel] {
+        max-width: calc(100vw - 1.5rem);
+    }
+}
+
+/* Aksesibilitas: hormati preferensi pengurangan animasi. */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+
+/* =========================================================
+   TRIX GLOBAL PAGE LOADER
+   ========================================================= */
+#trix-global-page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(244, 246, 255, .94);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .22s ease, visibility .22s ease;
+}
+#trix-global-page-loader.trix-loader-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+#trix-global-page-loader.trix-loader-hidden { display: none; }
+.trix-loader-panel {
+    width: min(340px, 100%);
+    padding: 34px 30px 28px;
+    text-align: center;
+    border: 1px solid rgba(214, 222, 240, .9);
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(36, 48, 90, .14);
+}
+.trix-loader-logo {
+    margin-bottom: 28px;
+    color: #243b91;
+    font-size: 23px;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -1.2px;
+}
+.trix-loader-logo span:last-child { color: #7655f6; }
+.trix-loader-mark { color: #f04438; font-size: 31px; vertical-align: -2px; }
+.trix-loader-spinner {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 20px;
+    border: 4px solid #e9eaff;
+    border-top-color: #6657f5;
+    border-right-color: #9b52e8;
+    border-radius: 50%;
+    animation: trixLoaderSpin .8s linear infinite;
+}
+.trix-loader-spinner i {
+    position: absolute;
+    inset: 9px;
+    border: 3px solid #e8f7fb;
+    border-bottom-color: #10a6c5;
+    border-radius: 50%;
+    animation: trixLoaderSpin 1.2s linear infinite reverse;
+}
+.trix-loader-title { color: #1c2a40; font-size: 14px; font-weight: 800; }
+.trix-loader-subtitle { margin-top: 7px; color: #71809b; font-size: 11px; }
+.trix-loader-track {
+    height: 4px;
+    margin-top: 23px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: #edf0fa;
+}
+.trix-loader-track span {
+    display: block;
+    width: 38%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #6557f5, #b34bd2, #11a8c4);
+    animation: trixLoaderProgress 1.25s ease-in-out infinite;
+}
+@keyframes trixLoaderSpin { to { transform: rotate(360deg); } }
+@keyframes trixLoaderProgress {
+    0% { transform: translateX(-110%); }
+    100% { transform: translateX(280%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .trix-loader-spinner, .trix-loader-spinner i, .trix-loader-track span { animation-duration: 2.5s; }
+}
