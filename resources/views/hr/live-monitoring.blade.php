@@ -58,6 +58,43 @@
             z-index: 1;
         }
 
+        /* Fullscreen map panel */
+        #fleetMapCard:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            border: 0;
+            border-radius: 0;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+
+        #fleetMapCard:fullscreen > .fleet-map-toolbar,
+        #fleetMapCard:fullscreen > .fleet-map-legend {
+            flex: 0 0 auto;
+        }
+
+        #fleetMapCard:fullscreen #fleetMap {
+            flex: 1 1 auto;
+            height: auto;
+            min-height: 0;
+            width: 100%;
+        }
+
+        #fleetMapCard:fullscreen .leaflet-container {
+            height: 100%;
+        }
+
+        #fullscreenMapButton {
+            transition: background .2s ease, border-color .2s ease;
+        }
+
+        #fullscreenMapButton:hover {
+            background: #EEF2FF;
+            border-color: #6366F1;
+        }
+
         .leaflet-container {
             font-family: inherit;
         }
@@ -448,9 +485,9 @@
             <section class="grid grid-cols-1 gap-5 2xl:grid-cols-[minmax(0,1fr)_350px]">
 
                 <!-- MAP -->
-                <div class="trix-anim trix-card overflow-hidden rounded-2xl border border-[#D6DEEA] bg-white">
+                <div id="fleetMapCard" class="trix-anim trix-card overflow-hidden rounded-2xl border border-[#D6DEEA] bg-white">
 
-                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E7EF] px-5 py-4">
+                    <div class="fleet-map-toolbar flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E7EF] px-5 py-4">
 
                         <div>
                             <h3 class="text-sm font-bold">Fleet Location Map</h3>
@@ -460,17 +497,28 @@
                             </p>
                         </div>
 
-                       <button type="button" id="refreshMapButton"
-                                onclick="window.trixFleetRefresh && window.trixFleetRefresh()"
-                                class="rounded-lg border border-indigo-200 bg-white px-3 py-2 text-[10px] font-bold text-indigo-600 hover:bg-indigo-50">
-                            <span class="trix-refresh-icon inline-block mr-1">
-                                <svg class="h-3 w-3 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-                                    <path d="M23 4v6h-6M1 20v-6h6"/>
-                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" id="fullscreenMapButton"
+                                    class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold text-slate-700"
+                                    aria-label="Tampilkan peta fullscreen" aria-pressed="false">
+                                <svg class="mr-1 inline h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/>
                                 </svg>
-                            </span>
-                            <span id="refreshMapText">Refresh Map</span>
-                        </button>
+                                <span id="fullscreenMapText">Fullscreen</span>
+                            </button>
+
+                            <button type="button" id="refreshMapButton"
+                                    onclick="window.trixFleetRefresh && window.trixFleetRefresh()"
+                                    class="rounded-lg border border-indigo-200 bg-white px-3 py-2 text-[10px] font-bold text-indigo-600 hover:bg-indigo-50">
+                                <span class="trix-refresh-icon inline-block mr-1">
+                                    <svg class="h-3 w-3 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                                        <path d="M23 4v6h-6M1 20v-6h6"/>
+                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                                    </svg>
+                                </span>
+                                <span id="refreshMapText">Refresh Map</span>
+                            </button>
+                        </div>
 
                     </div>
 
@@ -484,7 +532,7 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-6 border-t border-[#E2E7EF] px-5 py-4 text-[10px] text-slate-600">
+                    <div class="fleet-map-legend flex flex-wrap items-center gap-6 border-t border-[#E2E7EF] px-5 py-4 text-[10px] text-slate-600">
                         <span>● On Trip</span>
                         <span class="text-emerald-600">● GPS Active</span>
                         <span class="text-orange-500">● Waiting GPS</span>
@@ -1325,6 +1373,52 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // ==========================================
+    // FULLSCREEN MAP
+    // ==========================================
+
+    const mapCard = document.getElementById('fleetMapCard');
+    const fullscreenButton = document.getElementById('fullscreenMapButton');
+    const fullscreenText = document.getElementById('fullscreenMapText');
+
+    function updateFullscreenButton() {
+        const isFullscreen = document.fullscreenElement === mapCard;
+
+        if (fullscreenText) {
+            fullscreenText.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+        }
+
+        if (fullscreenButton) {
+            fullscreenButton.setAttribute('aria-pressed', isFullscreen ? 'true' : 'false');
+            fullscreenButton.setAttribute(
+                'aria-label',
+                isFullscreen ? 'Keluar dari fullscreen' : 'Tampilkan peta fullscreen'
+            );
+        }
+
+        // Leaflet perlu menghitung ulang ukuran setelah panel berubah.
+        setTimeout(function () {
+            fleetMap.invalidateSize({ pan: false });
+        }, 150);
+    }
+
+    if (mapCard && fullscreenButton) {
+        fullscreenButton.addEventListener('click', async function () {
+            try {
+                if (document.fullscreenElement === mapCard) {
+                    await document.exitFullscreen();
+                } else if (!document.fullscreenElement) {
+                    await mapCard.requestFullscreen();
+                }
+            } catch (error) {
+                console.error('Gagal mengubah mode fullscreen peta:', error);
+                alert('Browser tidak dapat membuka peta fullscreen. Coba gunakan browser terbaru.');
+            }
+        });
+
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+    }
+
+    // ==========================================
     // START MONITORING
     // ==========================================
 
@@ -1343,8 +1437,9 @@ window.trixFleetRefresh = function () {
     loadTracking();
 
 
-    // Ambil data terbaru setiap 5 detik.
-    setInterval(loadTracking, 5000);
+    // Ambil data terbaru setiap 2 detik.
+    // requestInProgress mencegah request bertumpuk.
+    setInterval(loadTracking, 2000);
 
 
 });
